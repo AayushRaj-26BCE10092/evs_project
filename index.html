@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EcoTrace – Daily Footprint</title>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#1f7a4d"><meta name="apple-mobile-web-app-capable" content="yes"><link rel="icon" href="icon.svg"><link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#f4f7f2;--card:#fff;--tx:#1b2a20;--mu:#5d6d63;--bd:#dde5da;--ac:#1f7a4d;--in:#eef3ec;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111a14;--card:#1a251d;--tx:#e8f0ea;--mu:#9bb0a2;--bd:#2b3a30;--ac:#4cc58a;--in:#223028;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#111a14;--card:#1a251d;--tx:#e8f0ea;--mu:#9bb0a2;--bd:#2b3a30;--ac:#4cc58a;--in:#223028;color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.5 system-ui,-apple-system,Segoe UI,sans-serif}
+.w{max-width:620px;margin:0 auto;padding:14px}h1{font-size:21px;margin:0}h2{font-size:15px;margin:0 0 8px}.s{color:var(--mu);margin:2px 0 12px;font-size:14px}
+.c{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px}.top input{width:auto;padding:6px 8px}
+input[type=date]{border:1px solid var(--bd);border-radius:8px;background:var(--in);color:var(--tx);font:inherit}
+.big{font-size:34px;font-weight:700;line-height:1.1}.big small{font-size:14px;font-weight:500;color:var(--mu)}
+.m{height:12px;background:var(--in);border-radius:6px;position:relative;margin:10px 0 4px;overflow:hidden}.m i{display:block;height:100%;border-radius:6px;transition:width .2s,background .2s}.m b{position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--tx);opacity:.5}
+.n{font-size:12px;color:var(--mu)}.sub{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:13px}.sub span{background:var(--in);border-radius:8px;padding:4px 9px}
+.sl .hd{display:flex;justify-content:space-between;align-items:baseline}.sl .nm{font-weight:600}.sl .v{font-size:20px;font-weight:700}.sl .v small{font-size:12px;color:var(--mu);font-weight:500}
+input[type=range]{width:100%;height:34px;margin:2px 0;accent-color:var(--ac)}
+.ch{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}.ch button{flex:1;min-width:90px;background:var(--in);color:var(--tx);border:1px solid var(--bd);border-radius:10px;padding:8px 6px;font:inherit;font-size:13px;cursor:pointer}.ch button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+.sv{width:100%;background:var(--ac);color:#fff;border:0;border-radius:12px;padding:14px;font:inherit;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:12px}
+.k{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.k div{background:var(--in);border-radius:10px;padding:8px 10px}.k small{color:var(--mu);display:block;font-size:11px}.k strong{font-size:17px}
+svg{width:100%;height:auto}.lg{display:flex;flex-wrap:wrap;gap:10px;font-size:12px;color:var(--mu)}.lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px}
+.h{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bd);font-size:13px}.h:last-child{border:0}
+.x{background:transparent;border:1px solid var(--bd);color:var(--mu);border-radius:8px;padding:3px 9px;cursor:pointer;font:inherit;font-size:12px}
+.tip{background:var(--in);border-radius:10px;padding:9px 11px;font-size:13px}
+</style></head><body><div class="w">
+<div class="top"><div><h1>🌍 EcoTrace</h1><p class="s" style="margin-bottom:0">Slide to your day's usage, see the impact.</p></div><input type="date" id="d"></div>
+<div class="c" style="margin-top:12px"><div class="n">Today's footprint</div>
+<div class="big"><span id="co">0</span> <small>kg CO₂e</small></div>
+<div class="m"><i id="bar"></i><b></b></div><div class="n" id="vd"></div>
+<div class="sub" id="sub"></div></div>
+<div class="c"><div class="n">Today's water footprint</div><div class="big"><span id="wo">0</span> <small>litres</small></div><div class="m"><i id="wbar"></i><b></b></div><div class="n" id="wvd"></div><div class="sub" id="wsub"></div></div>
+<div id="sl"></div>
+<div class="c"><h2>🍽️ Food today</h2><div class="ch" id="di"></div></div>
+<button class="sv" id="sv">Save today ✓</button>
+<div class="c"><h2>Your stats</h2><div class="k" id="k"></div></div>
+<div class="c"><h2>Last 7 logged days (kg CO₂e)</h2><svg id="chart" viewBox="0 0 520 200"></svg><div class="lg" id="lg"></div></div>
+<div class="c"><h2>Water footprint, last 7 logged days (litres)</h2><svg id="wchart" viewBox="0 0 520 200"></svg><div class="lg"><span><i style="background:#2e86c1"></i>Direct use</span><span><i style="background:#8cc4e8"></i>Virtual (food)</span><span>- - ~3,000 L Indian avg</span></div></div>
+<div class="c"><h2>💡 Tip for you</h2><div id="tp" class="tip"></div></div>
+<div class="c"><h2>History</h2><div id="hi"></div><button class="x" id="cl" style="margin-top:8px">Clear all</button></div>
+<p class="n">Approximate factors: electricity 0.71 kg CO₂/kWh (India grid), LPG 2.98 kg/kg, petrol 2.31 kg/L, diesel 2.68 kg/L. Prices are rough (₹7/kWh, ₹60/kg LPG, ₹100/L petrol, ₹90/L diesel). Water footprint = direct use + virtual water in food (about 2,000 L/day vegan to 5,400 L/day meat-heavy); ~3,000 L/day is roughly the Indian average. The black marker on the meter is ~5.5 kg/day (≈2 t/yr), a commonly cited sustainable level. Illustrative, not an audit.</p>
+</div>
+<script>
+const $=id=>document.getElementById(id),KEY='ecotrace_v2';
+const R=[{k:'el',ic:'💡',n:'Electricity',u:'kWh',max:30,st:.5,def:6,c:'#f2c230'},
+{k:'gas',ic:'🔥',n:'Cooking gas (LPG)',u:'kg',max:2,st:.05,def:.4,c:'#e8743b',note:'A 14.2 kg cylinder lasting 35 days ≈ 0.4 kg/day'},
+{k:'fu',ic:'⛽',n:'Fuel (vehicle)',u:'L',max:10,st:.1,def:1,c:'#6b7280',ft:1},
+{k:'wa',ic:'💧',n:'Water',u:'L',max:500,st:5,def:135,c:'#2e86c1',note:'Typical Indian urban use ≈ 135 L/person/day'}];
+const CAT=[...R.map(r=>[r.n.split(' ')[0],r.c]),['Food','#4cae6e']];
+const DIET=[2.9,3.8,5,7.2],VW=[2000,2500,3800,5400],DN=['🌱 Vegan','🥛 Vegetarian','🍗 Mixed','🥩 Meat-heavy'];
+const FUEL=[['Petrol',2.31,100],['Diesel',2.68,90]];
+let mem={};const load=()=>{try{return JSON.parse(localStorage.getItem(KEY))||mem}catch(e){return mem}};
+const save=o=>{mem=o;try{localStorage.setItem(KEY,JSON.stringify(o))}catch(e){}};
+let data=load();let s={};
+const today=()=>new Date().toISOString().slice(0,10);
+function calc(e){const f=FUEL[e.ft||0];const p=[e.el*.71,e.gas*2.98,e.fu*f[1],e.wa*.0003,DIET[e.di]];
+ return{p,co2:p.reduce((a,b)=>a+b,0),water:e.wa+VW[e.di],cost:e.el*7+e.gas*60+e.fu*f[2]}}
+function pick(d){const ks=Object.keys(data).sort();const e=data[d]||(ks.length?data[ks[ks.length-1]]:null);
+ s=e?{...e}:{el:6,gas:.4,fu:1,wa:135,ft:0,di:1}}
+function build(){$('sl').innerHTML=R.map(r=>`<div class="c sl"><div class="hd"><span class="nm">${r.ic} ${r.n}</span><span class="v"><span id="v_${r.k}"></span> <small>${r.u}</small></span></div>
+<input type="range" id="r_${r.k}" min="0" max="${r.max}" step="${r.st}">
+${r.ft?'<div class="ch" id="ft"></div>':''}<div class="n" id="h_${r.k}"></div>${r.note?`<div class="n">${r.note}</div>`:''}</div>`).join('');
+ R.forEach(r=>$('r_'+r.k).oninput=e=>{s[r.k]=+e.target.value;live()});
+ $('di').innerHTML=DN.map((d,i)=>`<button data-i="${i}">${d}</button>`).join('');
+ $('di').onclick=e=>{if(e.target.dataset.i!=null){s.di=+e.target.dataset.i;live()}};
+ $('ft').innerHTML=FUEL.map((f,i)=>`<button data-i="${i}">${f[0]}</button>`).join('');
+ $('ft').onclick=e=>{if(e.target.dataset.i!=null){s.ft=+e.target.dataset.i;live()}}}
+function live(){const c=calc(s);
+ R.forEach((r,i)=>{$('r_'+r.k).value=s[r.k];$('v_'+r.k).textContent=r.st<1?(+s[r.k]).toFixed(r.st<.1?2:1):s[r.k];
+  const f=[.71,2.98,FUEL[s.ft][1],.0003][i],pr=[7,60,FUEL[s.ft][2],0][i];
+  $('h_'+r.k).textContent=r.k=='wa'?`+ ${VW[s.di]} L hidden in your food = ${Math.round(c.water)} L total water footprint`:`≈ ${(s[r.k]*f).toFixed(2)} kg CO₂ · ₹${Math.round(s[r.k]*pr)}`});
+ document.querySelectorAll('#di button').forEach((b,i)=>b.classList.toggle('on',i==s.di));
+ document.querySelectorAll('#ft button').forEach((b,i)=>b.classList.toggle('on',i==s.ft));
+ $('co').textContent=c.co2.toFixed(1);const pc=Math.min(100,c.co2/11*100);$('bar').style.width=pc+'%';
+ $('bar').style.background=c.co2<=5.5?'#2fa866':c.co2<=8?'#e0a02c':'#d64545';
+ $('vd').textContent=c.co2<=5.5?'🟢 Within the sustainable daily level':c.co2<=8?'🟡 A bit above the sustainable level (5.5 kg)':'🔴 High — see the tip below';
+ $('sub').innerHTML=`<span>💧 ${Math.round(c.water)} L water</span><span>₹${Math.round(c.cost)} today</span><span>≈ ${(c.co2/.17).toFixed(0)} km by car</span><span>${(c.co2*30/1000).toFixed(2)} t if every month like this</span>`;
+ const wp=Math.min(100,c.water/6000*100);$('wo').textContent=Math.round(c.water).toLocaleString('en-IN');$('wbar').style.width=wp+'%';$('wbar').style.background=c.water<=3000?'#2fa866':c.water<=4500?'#e0a02c':'#d64545';
+ $('wvd').textContent=c.water<=3000?'🟢 At or below the approx. Indian average (~3,000 L/day)':c.water<=4500?'🟡 Above the Indian average (~3,000 L/day)':'🔴 High — mostly hidden virtual water in food';
+ $('wsub').innerHTML=`<span>🚿 ${s.wa} L direct</span><span>🍽️ ${VW[s.di]} L virtual (food)</span><span>${Math.round(c.water*30/1000)} m³ per month</span>`}
+function stats(){const ks=Object.keys(data).sort(),N=ks.length;const tot=[0,0,0,0,0];let w=0;
+ ks.forEach(k=>{const c=calc(data[k]);c.p.forEach((v,i)=>tot[i]+=v);w+=c.water});
+ const av=tot.map(v=>N?v/N:0),day=av.reduce((a,b)=>a+b,0);
+ let st=0,d=new Date();if(!data[today()])d.setDate(d.getDate()-1);while(data[d.toISOString().slice(0,10)]){st++;d.setDate(d.getDate()-1)}
+ $('k').innerHTML=`<div><small>Avg CO₂e / day</small><strong>${day.toFixed(1)} kg</strong></div><div><small>Per year (est.)</small><strong>${(day*.365).toFixed(1)} t</strong></div><div><small>Streak</small><strong>${st} 🔥</strong></div><div><small>Avg water / day</small><strong>${N?Math.round(w/N).toLocaleString('en-IN'):0} L</strong></div><div><small>Water per year</small><strong>${N?Math.round(w/N*365/1000):0} m³</strong></div><div><small>Virtual share</small><strong>${N?Math.round((1-ks.reduce((a,k)=>a+data[k].wa,0)/w)*100):0}%</strong></div>`;
+ const L=ks.slice(-7),M=Math.max(8,...L.map(k=>calc(data[k]).co2));let g='',bw=480/7;
+ [0,.5,1].forEach(f=>{const y=170-f*140;g+=`<line x1="30" x2="520" y1="${y}" y2="${y}" stroke="var(--bd)"/><text x="26" y="${y+4}" font-size="10" text-anchor="end" fill="var(--mu)">${(f*M).toFixed(0)}</text>`});
+ const ty=170-5.5/M*140;g+=`<line x1="30" x2="520" y1="${ty}" y2="${ty}" stroke="#4cc58a" stroke-dasharray="4 3"/>`;
+ L.forEach((k,j)=>{let b=170;calc(data[k]).p.forEach((v,i)=>{const h=v/M*140;b-=h;g+=`<rect x="${34+j*bw+4}" y="${b}" width="${bw-12}" height="${h}" fill="${CAT[i][1]}"/>`});g+=`<text x="${34+j*bw+bw/2-2}" y="188" font-size="10" text-anchor="middle" fill="var(--mu)">${k.slice(5)}</text>`});
+ $('chart').innerHTML=N?g:'<text x="260" y="100" text-anchor="middle" fill="var(--mu)" font-size="13">Save a day to see your chart</text>';
+ $('lg').innerHTML=CAT.map(c=>`<span><i style="background:${c[1]}"></i>${c[0]}</span>`).join('');
+ {const WM=Math.max(4000,...L.map(k=>data[k].wa+VW[data[k].di]));let q='';
+ [0,.5,1].forEach(f=>{const y=170-f*140;q+=`<line x1="30" x2="520" y1="${y}" y2="${y}" stroke="var(--bd)"/><text x="26" y="${y+4}" font-size="10" text-anchor="end" fill="var(--mu)">${Math.round(f*WM)}</text>`});
+ const wy=170-3000/WM*140;q+=`<line x1="30" x2="520" y1="${wy}" y2="${wy}" stroke="#4cc58a" stroke-dasharray="4 3"/>`;
+ L.forEach((k,j)=>{const e=data[k],dh=e.wa/WM*140,vh=VW[e.di]/WM*140,x=34+j*bw+4;q+=`<rect x="${x}" y="${170-dh}" width="${bw-12}" height="${dh}" fill="#2e86c1"/><rect x="${x}" y="${170-dh-vh}" width="${bw-12}" height="${vh}" fill="#8cc4e8"/><text x="${34+j*bw+bw/2-2}" y="188" font-size="10" text-anchor="middle" fill="var(--mu)">${k.slice(5)}</text>`});
+ $('wchart').innerHTML=N?q:'<text x="260" y="100" text-anchor="middle" fill="var(--mu)" font-size="13">Save a day to see your chart</text>'}
+ const T=['Switch to LEDs and 5-star appliances, set AC to 24–26 °C, unplug standby devices, or add rooftop solar.','Use a pressure cooker and lids, soak pulses, and keep burners matched to pan size. Consider induction or biogas.','Carpool or take metro/bus for short trips, combine errands, and keep tyres inflated. EV or CNG can cut tailpipe CO₂.','Fix leaks, take shorter showers, reuse RO reject water for cleaning, and harvest rainwater.','Add plant-based days. Local, seasonal and plant-rich meals cut carbon and virtual water the most.'];
+ if(!N){$('tp').textContent='Save your first day to get a personalised tip.'}else{const i=av.indexOf(Math.max(...av));$('tp').innerHTML=`<b>${CAT[i][0]} is your biggest source (${Math.round(av[i]/day*100)}%).</b> ${T[i==0?0:i==1?1:i==2?2:i==3?3:4]}`+(w/N>3000?`<br><b>💧 Water:</b> your footprint is ~${Math.round(w/N).toLocaleString('en-IN')} L/day, mostly hidden in food. Local, seasonal, plant-rich meals and shorter showers cut it most.`:'')}
+ $('hi').innerHTML=N?ks.slice().reverse().slice(0,6).map(k=>`<div class="h"><span>${k} · <b>${calc(data[k]).co2.toFixed(1)}</b> kg · ${Math.round(calc(data[k]).water)} L</span><button class="x" onclick="del('${k}')">✕</button></div>`).join(''):'<div class="n">No entries yet.</div>'}
+window.del=k=>{delete data[k];save(data);stats()};
+$('sv').onclick=()=>{data[$('d').value]={...s};save(data);stats();$('sv').textContent='Saved ✓';setTimeout(()=>$('sv').textContent='Save today ✓',1200)};
+$('cl').onclick=()=>{if(confirm('Delete all entries?')){data={};save(data);stats()}};
+$('d').onchange=()=>{pick($('d').value);live()};
+$('d').value=today();build();pick(today());live();stats();
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script></body></html>
