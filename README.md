@@ -15,4 +15,4 @@ Open `index.html` in a browser. (Install/offline mode needs HTTPS or localhost, 
 index.html (app) · manifest.webmanifest + sw.js (PWA/offline) · icon.svg, icon-192.png, icon-512.png
 
 ## Notes
-Emission factors and prices are approximate (India grid 0.71 kg CO2/kWh, LPG 2.98 kg/kg, petrol 2.31 kg/L, diesel 2.68 kg/L). Illustrative, not an audit.
+Emission factors and prices are approximate (India grid 0.71 kg CO2/kWh, LPG 2.98 kg/kg, petrol 2.31 kg/L, diesel 2.68 kg/L). Illustrative, not an audit. 
